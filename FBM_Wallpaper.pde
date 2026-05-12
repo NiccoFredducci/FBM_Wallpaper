@@ -14,8 +14,8 @@ float fps = 60;
 float radius = 1;
 
 void setup() {
-  //fullScreen(P2D);
-  size(1280,720,P2D);
+  fullScreen(P2D);
+  //size(1280,720,P2D);
   
   int seed = (int)random(16777216);
   //seed = 11511244;
