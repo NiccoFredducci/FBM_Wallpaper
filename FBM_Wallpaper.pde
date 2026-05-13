@@ -1,21 +1,30 @@
 PShader shader;
 
-color c1 = #0a162e;
-color c2 = #c0d0dc;
-color c3 = #87a9cf;
-color c4 = #27435b;
+color c1 = #061826; // Midnight Abyss
+color c2 = #0D3B66; // Deep Ocean Blue
+color c3 = #3A86C8; // Moonlit Azure
+color c4 = #A9D6E5; //Frost Blue
+
+float c2value = 0.2;
+float c3value = 0.5;
+
 float scale = 0.004;
 float scale1 = 4.0;
 float scale2 = 4.0;
 
-float duration = 8.0;
+float duration = 4.0;
 float fps = 60;
 
-float radius = 1;
+float radius = 0.5;
+
+PGraphics bg;
+
+int renderW = 1440;
+int renderH = 3136;
 
 void setup() {
-  fullScreen(P2D);
-  //size(1280,720,P2D);
+  //fullScreen(P2D);
+  size(200, 200, P2D);
   
   int seed = (int)random(16777216);
   //seed = 11511244;
@@ -23,12 +32,14 @@ void setup() {
   
   shader = loadShader("noise.glsl");
 
-  shader.set("resolution", (float)width, (float)height);
+  shader.set("resolution", (float)renderW, (float)renderH);
 
   shader.set("c1", red(c1)/255.0, green(c1)/255.0, blue(c1)/255.0);
   shader.set("c2", red(c2)/255.0, green(c2)/255.0, blue(c2)/255.0);
   shader.set("c3", red(c3)/255.0, green(c3)/255.0, blue(c3)/255.0);
   shader.set("c4", red(c4)/255.0, green(c4)/255.0, blue(c4)/255.0);
+  shader.set("c2value", c2value);
+  shader.set("c3value", c3value);
 
   shader.set("scale", scale);
   shader.set("scale1", scale1);
@@ -38,18 +49,33 @@ void setup() {
   
   shader.set("duration", duration);
   shader.set("radius", radius);
+  
+  bg = createGraphics(renderW, renderH, P2D);
 }
 
 void draw() {
-  shader.set("time", frameCount / fps);
-  shader(shader);
-  rect(0, 0, width, height);
-  println(frameRate);
-  saveFrame("frames/frame-####.png");
-  if (true){//frameCount >= duration * fps) {
-    //exit();
+  if (frameCount <= duration * fps)
+    shader.set("time", customEase(frameCount / fps / duration) * duration);
+  else
+    shader.set("time", duration);
+  
+  bg.beginDraw();
+  bg.shader(shader);
+  bg.noStroke();
+  bg.rect(0, 0, renderW, renderH);
+  bg.endDraw();
+  image(bg, 0, 0, width, height);
+  bg.save("frames/frame-" + nf(frameCount, 4) + ".png");
+  if (frameCount >= duration * fps) {
+    exit();
   }
-  noLoop();
+}
+
+float inFactor = 1.5;
+float outFactor = 5;
+
+float customEase (float x) {
+  return (1 - x) * pow(x, inFactor) + x - x * pow(1 - x, outFactor);
 }
 
 /*

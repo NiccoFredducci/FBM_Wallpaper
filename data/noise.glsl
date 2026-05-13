@@ -12,6 +12,9 @@ uniform vec3 c2;
 uniform vec3 c3;
 uniform vec3 c4;
 
+uniform float c2value;
+uniform float c3value;
+
 uniform float scale;
 uniform float scale1;
 uniform float scale2;
@@ -121,11 +124,11 @@ void main() {
   float t = fbm(p + vec4(r, 0.0, 0.0));
   t *= t * t;
 
-  float tt = clamp(t, 0.0, 1.0);
-  float qy = clamp(q.x * q.x * q.x, 0.0, 1.0);
-  float ry = clamp(r.y * r.y * r.y, 0.0, 1.0);
+  float t1 = clamp(t * 1 / c2value, 0.0, 1.0);
+  float t2 = clamp((t - c2value) / (c3value - c2value), 0.0, 1.0);
+  float t3 = clamp((t - c3value) / (1 - c3value), 0.0, 1.0);
 
-  vec3 col = mix(mix(mix(c1, c2, tt), c3, 1 - qy), c4, 1 - ry);
+  vec3 col = mix(mix(mix(c1, c2, t1), c3, t2), c4, t3);
 
   gl_FragColor = vec4(col, 1.0);
 }
